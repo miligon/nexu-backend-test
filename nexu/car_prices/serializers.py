@@ -18,5 +18,4 @@ class ModelInfoSerializer(serializers.ModelSerializer):
         model = ModelInfo
         fields = ('id',
                   'name',
-                  'brand_name',
                   'average_price')
