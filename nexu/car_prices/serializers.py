@@ -14,9 +14,9 @@ class BrandListSerializer(serializers.ModelSerializer):
                   )
 
 class ModelInfoSerializer(serializers.ModelSerializer):
-    nombre = serializers.CharField(source='name')
     class Meta:
         model = ModelInfo
         fields = ('id',
                   'name',
+                  'brand_name',
                   'average_price')
