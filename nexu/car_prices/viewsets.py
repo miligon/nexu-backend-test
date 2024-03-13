@@ -4,12 +4,13 @@ from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework import status
 
 from .models import Brands, ModelInfo
 from .serializers import BrandListSerializer, ModelInfoSerializer
 
 @api_view(['GET', 'POST'])
-def listAllBrands(request):
+def brands(request):
     '''
     GET /brands
 
@@ -32,15 +33,15 @@ def listAllBrands(request):
         if name:
             brand, created = Brands.objects.get_or_create(name=name)
             if created:
-                return Response(request.data)
+                return Response(request.data, status=status.HTTP_201_CREATED)
             else:
-                return Response({"error": "brand already exists"})
+                return Response({"error": "brand already exists"}, status=status.HTTP_400_BAD_REQUEST)
         
 
             
-        return Response({"error": "name is missing"})    
+        return Response({"error": "name is missing"}, status=status.HTTP_400_BAD_REQUEST)    
     
-    return Response({"error": "Method not allowed"})
+    return Response({"error": "Method not allowed"}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
     
 @api_view(['POST'])
 def addModelToBrand(request, id):
@@ -58,21 +59,21 @@ def addModelToBrand(request, id):
         try:
             price = int(avg_price) if int(avg_price) > 100000 else 0
             if avg_price and price <= 100000:
-                return Response({"error": "average price must be greater than 100000"})
+                return Response({"error": "average price must be greater than 100000"}, status=status.HTTP_400_BAD_REQUEST)
             
             brand = Brands.objects.get(id=id)
             if ModelInfo.objects.filter(Q(brand_name=brand) & Q(name=name)).exists():
-                return Response({"error": "model name already exists"})
+                return Response({"error": "model name already exists"}, status=status.HTTP_400_BAD_REQUEST)
             
             model = ModelInfo.objects.create(name=name, average_price=price, brand_name=brand)
             response = ModelInfoSerializer(model)
             return Response(response.data)
             
         except Brands.DoesNotExist:
-            return Response({"error": "brand does not exists"}) 
+            return Response({"error": "brand does not exists"}, status=status.HTTP_400_BAD_REQUEST) 
 
         
-    return Response({"error": "name is missing"})  
+    return Response({"error": "name is missing"}, status=status.HTTP_400_BAD_REQUEST)  
 
 @api_view(['PUT'])
 def editModels(request, id):
@@ -94,10 +95,10 @@ def editModels(request, id):
             return Response(response.data)
             
         except Brands.DoesNotExist:
-            return Response({"error": "model does not exists"}) 
+            return Response({"error": "model does not exists"}, status=status.HTTP_400_BAD_REQUEST) 
 
     else:
-        return Response({"error": "average price is missing or is less than 100000"})
+        return Response({"error": "average price is missing or is less than 100000"}, status=status.HTTP_400_BAD_REQUEST)
     
 @api_view(['GET'])
 def listAllModels(request):
