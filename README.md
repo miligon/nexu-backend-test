@@ -19,6 +19,7 @@ Steps:
 To run test cases use: python manage.py test
 
 ## URL
-Test server: 
+Test server: https://nexu.lemonx.cloud/
+Example: https://nexu.lemonx.cloud/brands
 
 
